@@ -70,7 +70,7 @@ public class TerraBpsiDpLiquidityPoolRefreshJob
         using var db = _dbFactory.OpenDbConnection();
 
         var latestRow = await db.SingleAsync(
-            db.From<TerraLiquidityPoolEntity>()
+            db.From<TerraLiquidityPoolTradesEntity>()
                 .OrderByDescending(q => q.CreatedAt), token: stoppingToken);
 
         await foreach (var (terraTx, msg) in _transactionEnumerator.EnumerateTransactionsAsync(
