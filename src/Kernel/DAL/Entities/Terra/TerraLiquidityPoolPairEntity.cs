@@ -25,6 +25,13 @@ public class TerraLiquidityPoolPairEntity
         
     [Index]
     public string Farm { get; set; }
+    
+    [Index]
+    [Required]
+    public DecentralizedExchange Dex { get; set; }
         
     public DateTimeOffset CreatedAt { get; set; }
+    
+    [Index]
+    public string Wallet { get; set; }
 }

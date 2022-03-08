@@ -73,13 +73,18 @@ public static class TerraswapLpFarmingContracts
     public const string NEXUS_NETH_PSI_FARM = "terra1lws09x0slx892ux526d6atwwgdxnjg58uan8ph";
     
     public const string PYLON_MINE_UST_FARM = "terra19nek85kaqrvzlxygw20jhy08h3ryjf5kg4ep3l";
-        
+
     public const string STT_INTERSTELLARS_FARM = "terra1v6cagryg27qyk7alp7lq35fttkjyn8cmd73fgv";
         
     public const string STT_INTERSTELLARS_LP_FARM = "terra1snra29afr9efzt6l34wfnhj3jn90hq6rx8jhje";
         
     public const string VALKYRIE_VKR_UST_FARM = "terra1ude6ggsvwrhefw2dqjh4j6r7fdmu9nk6nf2z32";
     
+}
+
+public static class AstroportLpFarmingContracts
+{
+    public const string PYLON_MINE_UST_FARM = "terra16unvjel8vvtanxjpw49ehvga5qjlstn8c826qe";
 }
 
 public static class TerraAirdropContracts
