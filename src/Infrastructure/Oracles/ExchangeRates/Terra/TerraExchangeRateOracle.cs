@@ -9,17 +9,14 @@ namespace Pylonboard.Infrastructure.Oracles.ExchangeRates.Terra;
 public class TerraExchangeRateOracle
 {
     private readonly ITerraMoneyExchangeRateApiClient _exchangeRateApiClient;
-    private readonly IDbConnectionFactory _connectionFactory;
     private readonly ILogger<TerraExchangeRateOracle> _logger;
 
     public TerraExchangeRateOracle(
         ITerraMoneyExchangeRateApiClient exchangeRateApiClient,
-        IDbConnectionFactory connectionFactory,
         ILogger<TerraExchangeRateOracle> logger
     )
     {
         _exchangeRateApiClient = exchangeRateApiClient;
-        _connectionFactory = connectionFactory;
         _logger = logger;
     }
 
