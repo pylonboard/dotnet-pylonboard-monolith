@@ -16,15 +16,15 @@ using TxLogExtensions = TerraDotnet.Extensions.TxLogExtensions;
 
 namespace Pylonboard.Infrastructure.Hosting.TerraDataFetchers;
 
-public class MineStakingDataFetcher
+public class PylonGovernanceDataFetcher
 {
-    private readonly ILogger<MineStakingDataFetcher> _logger;
+    private readonly ILogger<PylonGovernanceDataFetcher> _logger;
     private readonly TerraTransactionEnumerator _transactionEnumerator;
     private readonly IDbConnectionFactory _dbFactory;
     private readonly IBus _bus;
 
-    public MineStakingDataFetcher(
-        ILogger<MineStakingDataFetcher> logger,
+    public PylonGovernanceDataFetcher(
+        ILogger<PylonGovernanceDataFetcher> logger,
         TerraTransactionEnumerator transactionEnumerator,
         IDbConnectionFactory dbFactory,
         IBus bus
@@ -74,7 +74,7 @@ public class MineStakingDataFetcher
                 },
                 token: stoppingToken
             );
-
+            
             await _bus.Publish(new MineStakingTransactionMessage
                 {
                     TransactionId = tx.Id

@@ -14,14 +14,14 @@ using TerraDotnet.TerraFcd.Messages.Wasm;
 
 namespace Pylonboard.Infrastructure.Consumers.Terra;
 
-public class MineStakingTransactionConsumer : IConsumer<MineStakingTransactionMessage>
+public class PylonGovernanceTransactionConsumer : IConsumer<MineStakingTransactionMessage>
 {
-    private readonly ILogger<MineStakingTransactionConsumer> _logger;
+    private readonly ILogger<PylonGovernanceTransactionConsumer> _logger;
     private readonly IDbConnectionFactory _dbFactory;
     private readonly IdGenerator _idGenerator;
 
-    public MineStakingTransactionConsumer(
-        ILogger<MineStakingTransactionConsumer> logger,
+    public PylonGovernanceTransactionConsumer(
+        ILogger<PylonGovernanceTransactionConsumer> logger,
         IDbConnectionFactory dbFactory,
         IdGenerator idGenerator
     )

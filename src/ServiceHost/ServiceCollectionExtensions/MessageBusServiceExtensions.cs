@@ -28,7 +28,7 @@ public static class MessageBusServiceExtensions
             if (enabledServiceRolesConfig.IsRoleEnabled(ServiceRoles.BACKGROUND_WORKER))
             {
                 x.AddConsumers(
-                    typeof(MineStakingTransactionConsumer).Assembly
+                    typeof(PylonGovernanceTransactionConsumer).Assembly
                 );
             }
                 

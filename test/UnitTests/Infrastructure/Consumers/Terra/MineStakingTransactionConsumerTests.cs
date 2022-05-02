@@ -15,14 +15,14 @@ namespace UnitTests.Infrastructure.Consumers.Terra;
 public class MineStakingTransactionConsumerTests
 {
     private readonly IdGenerator _idGenerator;
-    private readonly MineStakingTransactionConsumer _consumer;
+    private readonly PylonGovernanceTransactionConsumer _consumer;
     private readonly string _testFilesBasePath;
 
     public MineStakingTransactionConsumerTests()
     {
         _idGenerator = A.Fake<IdGenerator>(opts => opts.Strict());
-        _consumer = new MineStakingTransactionConsumer(
-            A.Fake<ILogger<MineStakingTransactionConsumer>>(),
+        _consumer = new PylonGovernanceTransactionConsumer(
+            A.Fake<ILogger<PylonGovernanceTransactionConsumer>>(),
             A.Fake<IDbConnectionFactory>(opts => opts.Strict()),
             _idGenerator
         );

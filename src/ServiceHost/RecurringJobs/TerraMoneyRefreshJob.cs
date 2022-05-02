@@ -9,7 +9,7 @@ namespace Pylonboard.ServiceHost.RecurringJobs;
 public class TerraMoneyRefreshJob
 {
     private readonly ILogger<TerraMoneyRefreshJob> _logger;
-    private readonly MineStakingDataFetcher _mineStakingDataFetcher;
+    private readonly PylonGovernanceDataFetcher _pylonGovernanceDataFetcher;
     private readonly MineBuybackDataFetcher _mineBuybackDataFetcher;
     private readonly PylonPoolsDataFether _pylonPoolsDataFether;
     private readonly MineTreasuryDataFetcher _mineTreasuryDataFetcher;
@@ -18,7 +18,7 @@ public class TerraMoneyRefreshJob
 
     public TerraMoneyRefreshJob(
         ILogger<TerraMoneyRefreshJob> logger,
-        MineStakingDataFetcher mineStakingDataFetcher,
+        PylonGovernanceDataFetcher pylonGovernanceDataFetcher,
         MineBuybackDataFetcher mineBuybackDataFetcher,
         PylonPoolsDataFether pylonPoolsDataFether,
         MineTreasuryDataFetcher mineTreasuryDataFetcher,
@@ -27,7 +27,7 @@ public class TerraMoneyRefreshJob
     )
     {
         _logger = logger;
-        _mineStakingDataFetcher = mineStakingDataFetcher;
+        _pylonGovernanceDataFetcher = pylonGovernanceDataFetcher;
         _mineBuybackDataFetcher = mineBuybackDataFetcher;
         _pylonPoolsDataFether = pylonPoolsDataFether;
         _mineTreasuryDataFetcher = mineTreasuryDataFetcher;
@@ -76,7 +76,7 @@ public class TerraMoneyRefreshJob
                 });
 
         await retryPolicy.ExecuteAsync(async () => await _pylonPoolsDataFether.FetchDataAsync(stoppingToken, gatewayPoolfullResync));
-        await retryPolicy.ExecuteAsync(async () => await _mineStakingDataFetcher.FetchDataAsync(stoppingToken, mineStakingFullResync));
+        await retryPolicy.ExecuteAsync(async () => await _pylonGovernanceDataFetcher.FetchDataAsync(stoppingToken, mineStakingFullResync));
         await retryPolicy.ExecuteAsync(async () => await _mineBuybackDataFetcher.FetchDataAsync(stoppingToken, mineBuybackFullResync));
         await retryPolicy.ExecuteAsync(async () => await _mineTreasuryDataFetcher.FetchDataAsync(stoppingToken, mineBuybackFullResync));
     }
