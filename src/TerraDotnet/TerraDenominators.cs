@@ -54,6 +54,8 @@ public static class TerraDenominators
         { TerraTokenContracts.WHALE, Whale},
         { TerraTokenContracts.ARTS, Arts},
         { TerraTokenContracts.WCOIN, WCoin},
+        { TerraTokenContracts.GLOW, Glow},
+        
     };
 
 
