@@ -1,8 +1,13 @@
+using System;
 using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using FakeItEasy;
+using MassTransit;
 using Microsoft.Extensions.Logging;
 using Pylonboard.Infrastructure.Consumers.Terra;
+using Pylonboard.Kernel.Contracts.Terra;
 using Pylonboard.Kernel.IdGeneration;
 using ServiceStack.Data;
 using TerraDotnet.Extensions;
@@ -30,18 +35,21 @@ public class MineStakingTransactionConsumerTests
     }
 
     [Fact]
-    public void HandleGovStake_works()
+    public async Task HandleGovStake_works()
     {
         // Arrange
         A.CallTo(() => _idGenerator.Snowflake()).Returns(1);
-        var json = File.ReadAllText($"{_testFilesBasePath}/mine_gov_stake.json");
+        var json = await File.ReadAllTextAsync($"{_testFilesBasePath}/mine_gov_stake.json");
         var terraTx = json.ToObject<TerraTxWrapper>()!;
         var coreTx = TerraTransactionValueFactory.GetIt(terraTx);
+        var consumeContext = A.Fake<ConsumeContext<MineStakingTransactionMessage>>();
 
         // Act
-        var actuals = _consumer.ProcessTransaction(
+        var actuals = await _consumer.ProcessTransactionAsync(
             terraTx,
-            coreTx
+            coreTx,
+            consumeContext,
+            CancellationToken.None
         );
 
         // Assert
@@ -51,22 +59,25 @@ public class MineStakingTransactionConsumerTests
         Assert.Equal(1, actual.Id);
         Assert.Equal(3984.27m, actual.Amount);
         Assert.Equal("terra16hw950c7gznakfe5rcuj4dj8v94em9kdw9wak6", actual.Sender);
-        Assert.Equal(false, actual.IsBuyBack);
+        Assert.False(actual.IsBuyBack);
     }
 
     [Fact]
-    public void HandleGovUnstake_works()
+    public async Task HandleGovUnstake_works()
     {
         // Arrange
         A.CallTo(() => _idGenerator.Snowflake()).Returns(1);
-        var json = File.ReadAllText($"{_testFilesBasePath}/mine_gov_unstake.json");
+        var json = await File.ReadAllTextAsync($"{_testFilesBasePath}/mine_gov_unstake.json");
         var terraTx = json.ToObject<TerraTxWrapper>()!;
         var coreTx = TerraTransactionValueFactory.GetIt(terraTx);
+        var consumeContext = A.Fake<ConsumeContext<MineStakingTransactionMessage>>();
 
         // Act
-        var actuals = _consumer.ProcessTransaction(
+        var actuals = await _consumer.ProcessTransactionAsync(
             terraTx,
-            coreTx
+            coreTx,
+            consumeContext,
+            CancellationToken.None
         );
 
         // Assert
@@ -76,25 +87,51 @@ public class MineStakingTransactionConsumerTests
         Assert.Equal(1, actual.Id);
         Assert.Equal(-18000m, actual.Amount);
         Assert.Equal("terra1g0uzl468etgkx0gkts42mg7ly6waqkemw89lsh", actual.Sender);
-        Assert.Equal(false, actual.IsBuyBack);
+        Assert.False(actual.IsBuyBack);
     }
 
     [Fact]
-    public void IgnoresVotes()
+    public async Task IgnoresVotes()
     {
         // Arrange
         A.CallTo(() => _idGenerator.Snowflake()).Returns(1);
-        var json = File.ReadAllText($"{_testFilesBasePath}/mine_gov_vote.json");
+        var json = await File.ReadAllTextAsync($"{_testFilesBasePath}/mine_gov_vote.json");
         var terraTx = json.ToObject<TerraTxWrapper>()!;
         var coreTx = TerraTransactionValueFactory.GetIt(terraTx);
+        var consumeContext = A.Fake<ConsumeContext<MineStakingTransactionMessage>>();
 
         // Act
-        var actuals = _consumer.ProcessTransaction(
+        var actuals = await _consumer.ProcessTransactionAsync(
             terraTx,
-            coreTx
+            coreTx,
+            consumeContext,
+            CancellationToken.None
         );
 
         // Assert
         Assert.Empty(actuals);
+    }
+
+    [Fact]
+    public async Task DispatchesMessageForAirdropClaim()
+    {
+        A.CallTo(() => _idGenerator.Snowflake()).Returns(1);
+        var json = await File.ReadAllTextAsync($"{_testFilesBasePath}/pylon_airdrop_claim.json");
+        var terraTx = json.ToObject<TerraTxWrapper>()!;
+        var coreTx = TerraTransactionValueFactory.GetIt(terraTx);
+        var consumeContext = A.Fake<ConsumeContext<MineStakingTransactionMessage>>();
+
+        var actuals = await _consumer.ProcessTransactionAsync(
+            terraTx,
+            coreTx,
+            consumeContext,
+            CancellationToken.None
+        );
+
+        // Assert
+        Assert.Empty(actuals);
+
+        A.CallTo(() => consumeContext.Publish(A<PylonGovernanceAirdropClaimMessage>.Ignored, CancellationToken.None))
+            .MustHaveHappenedOnceExactly();
     }
 }

@@ -13,6 +13,7 @@ namespace Pylonboard.Kernel.DAL.Entities.Terra
         public long TransactionId { get; set; }
 
         [Index] 
+        [Alias("recipient")]
         public string Wallet { get; set; }
 
         [Index] 

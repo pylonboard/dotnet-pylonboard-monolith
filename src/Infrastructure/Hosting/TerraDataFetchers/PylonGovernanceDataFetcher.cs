@@ -64,7 +64,7 @@ public class PylonGovernanceDataFetcher
                 );
                 return;
             }
-
+            
             await db.SaveAsync(obj: new TerraRawTransactionEntity
                 {
                     Id = tx.Id,
