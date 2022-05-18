@@ -14,14 +14,14 @@ using TerraDotnet.TerraFcd.Messages.Wasm;
 
 namespace Pylonboard.Infrastructure.Consumers.Terra;
 
-public class MineStakingTransactionConsumer : IConsumer<MineStakingTransactionMessage>
+public class PylonGovernanceTransactionConsumer : IConsumer<MineStakingTransactionMessage>
 {
-    private readonly ILogger<MineStakingTransactionConsumer> _logger;
+    private readonly ILogger<PylonGovernanceTransactionConsumer> _logger;
     private readonly IDbConnectionFactory _dbFactory;
     private readonly IdGenerator _idGenerator;
 
-    public MineStakingTransactionConsumer(
-        ILogger<MineStakingTransactionConsumer> logger,
+    public PylonGovernanceTransactionConsumer(
+        ILogger<PylonGovernanceTransactionConsumer> logger,
         IDbConnectionFactory dbFactory,
         IdGenerator idGenerator
     )
@@ -59,7 +59,7 @@ public class MineStakingTransactionConsumer : IConsumer<MineStakingTransactionMe
         var msg = TerraTransactionValueFactory.GetIt(terraTx!);
         var cancellationToken = context.CancellationToken;
 
-        var datum = ProcessTransaction(terraTx!, msg);
+        var datum = await ProcessTransactionAsync(terraTx!, msg, context, cancellationToken);
         foreach (var data in datum)
         {
             await db.InsertAsync(data, token: cancellationToken);
@@ -73,10 +73,14 @@ public class MineStakingTransactionConsumer : IConsumer<MineStakingTransactionMe
     /// </summary>
     /// <param name="tx"></param>
     /// <param name="msg"></param>
+    /// <param name="consumeContext"></param>
+    /// <param name="cancellationToken"></param>
     /// <returns>A boolean as to whether transaction enumeration should be STOPPED</returns>
-    public List<TerraMineStakingEntity> ProcessTransaction(
+    public async Task<List<TerraMineStakingEntity>> ProcessTransactionAsync(
         TerraTxWrapper tx,
-        CoreStdTx msg
+        CoreStdTx msg,
+        ConsumeContext<MineStakingTransactionMessage> consumeContext,
+        CancellationToken cancellationToken
     )
     {
         var results = new List<TerraMineStakingEntity>();
@@ -149,7 +153,11 @@ public class MineStakingTransactionConsumer : IConsumer<MineStakingTransactionMe
             }
             else if (properMsg.Value.ExecuteMessage.Airdrop?.Claim != null)
             {
-                _logger.LogDebug("Airdrop claim, skipping");
+                _logger.LogDebug("Airdrop claim, publishing new message");
+                await consumeContext.Publish(new PylonGovernanceAirdropClaimMessage
+                {
+                    TransactionId = tx.Id
+                }, cancellationToken);
                 continue;
             }
             else if (properMsg.Value.ExecuteMessage.WithdrawVotingTokens != null)

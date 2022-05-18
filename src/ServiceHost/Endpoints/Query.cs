@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using HotChocolate.Types.Pagination;
 using NewRelic.Api.Agent;
+using Pylonboard.Kernel.DAL.Entities.Terra;
 using Pylonboard.ServiceHost.Endpoints.Arbitraging;
 using Pylonboard.ServiceHost.Endpoints.FxRates;
 using Pylonboard.ServiceHost.Endpoints.GatewayPoolStats;
@@ -11,6 +12,7 @@ using Pylonboard.ServiceHost.Endpoints.MineTreasury;
 using Pylonboard.ServiceHost.Endpoints.MineWalletStats;
 using Pylonboard.ServiceHost.Endpoints.MyGatewayPools;
 using Pylonboard.ServiceHost.Endpoints.MyPylonStake;
+using Pylonboard.ServiceHost.Endpoints.MyRewards;
 using Pylonboard.ServiceHost.Endpoints.Types;
 using ServiceStack.Caching;
 
@@ -304,6 +306,26 @@ public class Query
             cacheClient.Set(cacheKey, data, TimeSpan.FromMinutes(30));
         }
 
+        return data;
+    }
+
+    [Trace]
+    public async Task<MyRewardsGraph> GetMyRewards(
+        string terraWallet,
+        TerraRewardType rewardType,
+        [Service] MyRewardsService service,
+        [Service] ICacheClient cacheClient,
+        CancellationToken cancellationToken
+    )
+    {
+        var cacheKey = $"cache:rewards:{terraWallet}";
+        var data = cacheClient.Get<MyRewardsGraph>(cacheKey);
+
+        if (data == default)
+        {
+            data = await service.GetRewardsAsync(terraWallet, rewardType, cancellationToken);
+            cacheClient.Set(cacheKey, data, TimeSpan.FromMinutes(30));
+        }
         return data;
     }
 }
